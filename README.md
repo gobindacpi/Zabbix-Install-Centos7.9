@@ -1,91 +1,112 @@
 # Zabbix-Install-Centos7.9
 Zabbix Install on Centos 7.9
-
+```
 url:https://www.youtube.com/watch?v=JoaBN7etqfo
-
+```
 Check the version:
+```
 # cat /etc/redhat-release 
-
+```
 
 Disable SELinux
+```
 # vi /etc/sysconfig/selinux
+```
 Change “SELINUX=enforcing” to “SELINUX=disabled”
+```
 # getenforce (command to check the status)
+```
 
 (Download the repo of the Zabbix)
+```
 # rpm -Uvh https://repo.zabbix.com/zabbix/5.0/rhel/7/x86_64/zabbix-release-5.0-1.el7.noarch.rpm
-           https://repo.zabbix.com/zabbix/5.0/rhel/8/x86_64/zabbix-release-5.0-1.el8.noarch.rpm
 #  yum clean all
-
+```
 Install zabbix server, agent and zabbix-get for log files
+```
 # yum install zabbix-get zabbix-agent zabbix-server-mysql -y
-
+```
 Install Zabbix Front end
 Edit file and enable zabbix-frontend repository. 
+```
 # vi /etc/yum.repos.d/zabbix.repo
 [zabbix-frontend]
 enabled=1
-
+```
 Enable Red Hat Software Collections
+```
 # yum install centos-release-scl -y
-
+```
 Install Zabbix frontend packages:
+```
 # yum install zabbix-web-mysql-scl zabbix-apache-conf-scl -y
-
+```
 Install MariaDB server
+```
 # yum install mariadb-server -y
-
+```
 Start MariaDB
+```
 systemctl start mariadb
 systemctl enable mariadb
-
-
-mysql
+```
+```
+mariadb-secure-installation
 create database zabbix_db character set utf8 collate utf8_bin;
 grant all privileges on zabbix_db.* to zabbix@'localhost' identified by 'passw0rd';
 flush privileges;
+exit;
+```
 
 Database: zabbix_db
 Username: zabbix
 Password: passw0rd
 
 Extract Schema file:
+```
 # cd  /usr/share/doc/zabbix-server-mysql-5.0.33/
 # zcat create.sql.gz | mysql zabbix_db
-
+```
 Check the database
-# mysql
+```
+# mysql -u root -p 
 # use zabbix_db;
 # show tables;
-
+```
 Change the configuration file of Zabbix-server
+```
 # vim /etc/zabbix/zabbix_server.conf
-
+```
 Change these parameters on Zabbix_server.conf file.
 DBName=zabbix_db
 DBUser=zabbix
 DBPassword=passw0rd
 
 Start ZABBIX-SERVER
+```
 # systemctl start zabbix-server
-systemctl enable zabbix-server
-
+#systemctl enable zabbix-server
+```
 Check the Zabbix server is running or not by checking the log file
+```
 # less /var/log/zabbix/zabbix_server.log
-
+```
 Edit file and uncomment and set the right timezone for you. 
+```
 # vim /etc/opt/rh/rh-php72/php-fpm.d/zabbix.conf
 ; php_value[date.timezone] = Asia/Dhaka 
-
+```
 Start Zabbix server and agent processes:
+```
 # systemctl restart zabbix-server zabbix-agent httpd rh-php72-php-fpm mariadb
 # systemctl enable zabbix-server zabbix-agent httpd rh-php72-php-fpm mariadb
-
+```
 Modify the firewall
+```
 firewall-cmd --add-service={http,https} --permanent
 firewall-cmd --add-port={10051/tcp,10050/tcp} --permanent
 firewall-cmd --reload
-
+```
 Go to Browser
 Follow the instruction and use the database password, click next and login with default username and password.
 Username: Admin
@@ -100,7 +121,7 @@ cachesize=2G
 hisroeycache=512M
 valuesize=400M
 
-
+```
 
 
 
@@ -141,3 +162,4 @@ https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/media/telegram
 Token:6102204790:AAH-2mare2adfascdacd-txRlfX_95w
 
 
+```
